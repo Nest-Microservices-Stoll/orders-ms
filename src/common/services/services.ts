@@ -1,0 +1,4 @@
+
+
+
+export const PRODUCT_MICROSERVICE = 'PRODUCT_SERVICE'
