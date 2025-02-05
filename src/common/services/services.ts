@@ -2,3 +2,5 @@
 
 
 export const PRODUCT_MICROSERVICE = 'PRODUCT_SERVICE'
+
+export const NATS_SERVICE = 'NATS_SERVICE';
