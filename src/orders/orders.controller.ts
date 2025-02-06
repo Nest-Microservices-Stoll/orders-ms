@@ -1,20 +1,28 @@
 import { Controller, NotImplementedException } from '@nestjs/common';
-import { MessagePattern, Payload } from '@nestjs/microservices';
+import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrderPaginationDto } from './dto/order-pagination.dto';
 import { ChangeOrderStatusDto } from './dto/change-order-status.dto';
+import { PaidOrderDto } from './dto/paid-order.dto';
 
 @Controller()
 export class OrdersController {
-  constructor(private readonly ordersService: OrdersService) {}
+  constructor(private readonly ordersService: OrdersService) { }
 
 
-  
+
   @MessagePattern('createOrder')
-  create(@Payload() createOrderDto: CreateOrderDto) {
-    return this.ordersService.create(createOrderDto);
+  async create(@Payload() createOrderDto: CreateOrderDto) {
+
+    const order = await this.ordersService.create(createOrderDto);
+    const paymentSession = await this.ordersService.createPaymentSession(order)
+
+    return {
+      order,
+      paymentSession
+    }
   }
 
   @MessagePattern('findAllOrders')
@@ -31,17 +39,21 @@ export class OrdersController {
     return this.ordersService.findOne(id);
   }
 
- 
+
   @MessagePattern('changeOrderStatus')
   changeOrderStatus(@Payload() orderStatus: ChangeOrderStatusDto) {
 
-
-   
-
     return this.ordersService.changeOrderStatus(orderStatus)
 
-
-
   }
+
+
+  @EventPattern('payment.succeeded')
+  paidOrder(@Payload() paidOrderDto: PaidOrderDto) {
+
+    return this.ordersService.paidOrder(paidOrderDto)
+
+   
+  }
+
 }
- 
